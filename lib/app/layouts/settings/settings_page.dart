@@ -1,5 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:bluebubbles/app/components/avatars/contact_avatar_widget.dart';
+import 'package:bluebubbles/app/layouts/settings/pages/advanced/google_messages_panel.dart';
 import 'package:bluebubbles/app/layouts/settings/pages/advanced/notification_providers_panel.dart';
 import 'package:bluebubbles/app/layouts/settings/pages/advanced/tasker_panel.dart';
 import 'package:bluebubbles/app/layouts/settings/pages/profile/profile_panel.dart';
@@ -651,6 +652,38 @@ class _SettingsPageState extends OptimizedState<SettingsPage> {
                                               Icons.electric_bolt_outlined,
                                           containerColor: Colors.orangeAccent),
                                     ),
+                                  if (Platform.isAndroid)
+                                    const SettingsDivider(),
+                                  if (Platform.isAndroid)
+                                    Obx(() => SettingsTile(
+                                      backgroundColor: tileColor,
+                                      title: "Google Messages",
+                                      subtitle: "Experimental",
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            ss.settings.enableGoogleMessages.value ? "Enabled" : "Disabled",
+                                            style: context.theme.textTheme.bodyMedium!.apply(color: context.theme.colorScheme.outline.withOpacity(0.85)),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          const NextButton(),
+                                        ],
+                                      ),
+                                      onTap: () async {
+                                        ns.pushAndRemoveSettingsUntil(
+                                          context,
+                                          const GoogleMessagesPanel(),
+                                          (route) => route.isFirst,
+                                        );
+                                      },
+                                      leading: SettingsLeadingIcon(
+                                          iosIcon: CupertinoIcons.bubble_left_bubble_right_fill,
+                                          materialIcon: Icons.message,
+                                          containerColor: ss.settings.enableGoogleMessages.value 
+                                              ? Colors.green 
+                                              : Colors.grey),
+                                    )),
                                   if (!usingRustPush)
                                   const SettingsDivider(),
                                   if (!usingRustPush)
