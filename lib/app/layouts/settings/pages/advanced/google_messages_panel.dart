@@ -423,6 +423,77 @@ class _GoogleMessagesPanelState extends OptimizedState<GoogleMessagesPanel> {
                         ),
                       ],
                     ),
+                    SettingsHeader(
+                      iosSubtitle: iosSubtitle,
+                      materialSubtitle: materialSubtitle,
+                      text: "Diagnostics",
+                    ),
+                    SettingsSection(
+                      backgroundColor: tileColor,
+                      children: [
+                        SettingsTile(
+                          backgroundColor: tileColor,
+                          title: "View Diagnostics",
+                          subtitle: "View detailed diagnostic information",
+                          onTap: () {
+                            gms.logDiagnostics();
+                            final diag = gms.getDiagnostics();
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: context.theme.colorScheme.properSurface,
+                                title: Text(
+                                  'Google Messages Diagnostics',
+                                  style: context.theme.textTheme.titleLarge,
+                                ),
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: diag.entries.map((e) => Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${e.key}: ',
+                                            style: context.theme.textTheme.bodyMedium?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              '${e.value}',
+                                              style: context.theme.textTheme.bodyMedium,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )).toList(),
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: Text(
+                                      'Close',
+                                      style: context.theme.textTheme.bodyLarge!.copyWith(
+                                        color: context.theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                    onPressed: () => Navigator.of(context).pop(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          leading: const SettingsLeadingIcon(
+                            iosIcon: CupertinoIcons.info_circle,
+                            materialIcon: Icons.bug_report,
+                            containerColor: Colors.purple,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 );
               }),

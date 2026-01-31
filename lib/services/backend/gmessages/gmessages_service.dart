@@ -291,6 +291,33 @@ class GMessagesService extends GetxService {
     
     Logger.info('[$_tag] Pairing cancelled callback received');
   }
+  
+  /// Gets diagnostic information about the Google Messages integration.
+  /// Useful for troubleshooting and debugging.
+  Map<String, dynamic> getDiagnostics() {
+    return {
+      'isAvailable': isAvailable,
+      'isInitialized': isInitialized.value,
+      'featureEnabled': ss.settings.enableGoogleMessages.value,
+      'pairingState': pairingState.value.toString(),
+      'isPairing': isPairing.value,
+      'isPaired': isPaired,
+      'hasEncryptedCookies': _encryptedCookies != null,
+      'hasUserAgent': _userAgent != null,
+      'lastError': lastError.value,
+      'timestamp': DateTime.now().toIso8601String(),
+    };
+  }
+  
+  /// Logs diagnostic information for debugging purposes.
+  void logDiagnostics() {
+    final diag = getDiagnostics();
+    Logger.info('[$_tag] === Google Messages Diagnostics ===');
+    diag.forEach((key, value) {
+      Logger.info('[$_tag]   $key: $value');
+    });
+    Logger.info('[$_tag] === End Diagnostics ===');
+  }
 }
 
 /// Global instance accessor
