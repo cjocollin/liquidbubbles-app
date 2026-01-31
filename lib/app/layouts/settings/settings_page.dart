@@ -2,6 +2,7 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:bluebubbles/app/components/avatars/contact_avatar_widget.dart';
 import 'package:bluebubbles/app/layouts/settings/pages/advanced/notification_providers_panel.dart';
 import 'package:bluebubbles/app/layouts/settings/pages/advanced/tasker_panel.dart';
+import 'package:bluebubbles/app/layouts/settings/pages/gmessages/gmessages_panel.dart';
 import 'package:bluebubbles/app/layouts/settings/pages/profile/profile_panel.dart';
 import 'package:bluebubbles/app/layouts/settings/pages/scheduling/message_reminders_panel.dart';
 import 'package:bluebubbles/app/layouts/settings/pages/server/backup_restore_panel.dart';
@@ -651,6 +652,42 @@ class _SettingsPageState extends OptimizedState<SettingsPage> {
                                               Icons.electric_bolt_outlined,
                                           containerColor: Colors.orangeAccent),
                                     ),
+                                  // Google Messages - Android only, experimental
+                                  if (Platform.isAndroid)
+                                    const SettingsDivider(),
+                                  if (Platform.isAndroid)
+                                    Obx(() => SettingsTile(
+                                      backgroundColor: tileColor,
+                                      title: "Google Messages",
+                                      subtitle: "Experimental",
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            ss.settings.enableGoogleMessages.value 
+                                                ? (ss.settings.gmPairingState.value == GmPairingState.paired ? "Paired" : "Enabled")
+                                                : "Disabled",
+                                            style: context.theme.textTheme.bodyMedium!.apply(color: context.theme.colorScheme.outline.withOpacity(0.85)),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          const NextButton(),
+                                        ]
+                                      ),
+                                      onTap: () async {
+                                        ns.pushAndRemoveSettingsUntil(
+                                          context,
+                                          const GoogleMessagesPanel(),
+                                          (route) => route.isFirst,
+                                        );
+                                      },
+                                      leading: SettingsLeadingIcon(
+                                        iosIcon: CupertinoIcons.chat_bubble_2_fill,
+                                        materialIcon: Icons.message,
+                                        containerColor: ss.settings.enableGoogleMessages.value
+                                            ? (ss.settings.gmPairingState.value == GmPairingState.paired ? Colors.green : Colors.orange)
+                                            : Colors.grey,
+                                      ),
+                                    )),
                                   if (!usingRustPush)
                                   const SettingsDivider(),
                                   if (!usingRustPush)
