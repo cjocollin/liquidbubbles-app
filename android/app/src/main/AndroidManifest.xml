@@ -102,6 +102,15 @@
             android:theme="@style/Theme.Material3.DayNight.Dialog.Alert"
             android:taskAffinity=".AuthCode"/>
 
+        <!-- Google Messages WebView Pairing Activity -->
+        <activity
+            android:name=".services.gmessages.GMWebViewPairingActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:taskAffinity=".GMPairing"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:hardwareAccelerated="true"/>
+
         <receiver
             android:name=".PDUReceiver"
             android:exported="true">

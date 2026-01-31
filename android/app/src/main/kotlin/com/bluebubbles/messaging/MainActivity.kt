@@ -14,6 +14,7 @@ import com.bluebubbles.messaging.Constants
 import com.bluebubbles.messaging.services.extension.KeyboardViewFactory
 import com.bluebubbles.messaging.services.extension.LiveExtensionFactory
 import com.bluebubbles.messaging.services.extension.MessageViewHandle
+import com.bluebubbles.messaging.services.gmessages.GMPairingHandler
 import com.bluebubbles.messaging.services.rustpush.APNService
 import com.bluebubbles.messaging.services.system.CreateDocumentHandler
 import com.bluebubbles.messaging.services.system.EnableBTHandler
@@ -119,6 +120,11 @@ class MainActivity : FlutterFragmentActivity(), ComponentCallbacks2 {
         if (requestCode == Constants.enableBtRequestCode) {
             var result = EnableBTHandler.savedResult!!
             result.success(true)
+        }
+        
+        // Handle Google Messages pairing result
+        if (requestCode == 9001) { // REQUEST_CODE_PAIRING from GMPairingHandler
+            GMPairingHandler().handleActivityResult(requestCode, resultCode, data)
         }
     }
 }

@@ -443,6 +443,36 @@ class MethodChannelService extends GetxService {
         }
 
         return Future.value(true);
+      // Google Messages pairing callbacks
+      case "gm-pairing-complete":
+        Logger.info("Received Google Messages pairing complete");
+        try {
+          if (arguments != null) {
+            final encryptedCookies = arguments['encrypted_cookies'] as String?;
+            final userAgent = arguments['user_agent'] as String?;
+            if (encryptedCookies != null && userAgent != null) {
+              gms.onPairingComplete(encryptedCookies, userAgent);
+            }
+          }
+        } catch (e, s) {
+          Logger.error("GM pairing complete error", error: e, trace: s);
+        }
+        return Future.value(true);
+      case "gm-pairing-error":
+        Logger.info("Received Google Messages pairing error");
+        try {
+          if (arguments != null) {
+            final error = arguments['error'] as String? ?? 'Unknown error';
+            gms.onPairingError(error);
+          }
+        } catch (e, s) {
+          Logger.error("GM pairing error callback error", error: e, trace: s);
+        }
+        return Future.value(true);
+      case "gm-pairing-cancelled":
+        Logger.info("Received Google Messages pairing cancelled");
+        gms.onPairingCancelled();
+        return Future.value(true);
       default:
         return Future.value(true);
     }

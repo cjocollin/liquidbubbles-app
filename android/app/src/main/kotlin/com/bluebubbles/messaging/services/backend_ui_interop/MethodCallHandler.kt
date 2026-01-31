@@ -39,6 +39,8 @@ import com.bluebubbles.messaging.services.foreground.StartForegroundServiceHandl
 import com.bluebubbles.messaging.services.foreground.StopForegroundServiceHandler
 import com.bluebubbles.messaging.services.notifications.CreateMissedFaceTimeNotification
 import com.bluebubbles.messaging.services.rustpush.AppleAccountLoginHandler
+import com.bluebubbles.messaging.services.gmessages.GMKeystoreHandler
+import com.bluebubbles.messaging.services.gmessages.GMPairingHandler
 import com.bluebubbles.messaging.services.rustpush.EAPAKAGateway
 import com.bluebubbles.messaging.services.rustpush.GetNativeHandleHandler
 import com.bluebubbles.messaging.services.rustpush.KeystoreUnlockHandler
@@ -141,6 +143,13 @@ class MethodCallHandler {
             ProvisionNative.tag -> ProvisionNative().handleMethodCall(call, result, context)
             EAPAKAGateway.tag -> EAPAKAGateway().handleMethodCall(call, result, context)
             KeystoreUnlockHandler.tag -> KeystoreUnlockHandler().handleMethodCall(call, result, context)
+            // Google Messages handlers
+            GMKeystoreHandler.tag -> GMKeystoreHandler().handleMethodCall(call, result, context)
+            GMPairingHandler.tag -> GMPairingHandler().handleMethodCall(call, result, context)
+            // Also handle specific GM method names for consistency
+            "gm-keystore-ensure", "gm-keystore-encrypt", "gm-keystore-decrypt", 
+            "gm-keystore-delete", "gm-keystore-has-key" -> GMKeystoreHandler().handleMethodCall(call, result, context)
+            "gm-start-pairing", "gm-cancel-pairing", "gm-check-pairing-status" -> GMPairingHandler().handleMethodCall(call, result, context)
             "ready" -> { MainActivity.engine_ready = true }
             else -> {
                 val error = "Could not find method call handler for ${call.method}!"
