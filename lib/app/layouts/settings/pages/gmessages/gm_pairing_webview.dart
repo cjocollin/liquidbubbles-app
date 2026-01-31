@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:bluebubbles/database/models.dart';
 import 'package:bluebubbles/services/services.dart';
 import 'package:bluebubbles/helpers/helpers.dart';
@@ -205,15 +207,36 @@ class _GmPairingWebViewState extends State<GmPairingWebView> {
         throw Exception("No cookies found after pairing");
       }
       
-      // Build cookie header string
+      // Build cookie header string for Rust API
       final cookieHeader = cookies
           .map((c) => "${c.name}=${c.value}")
           .join("; ");
       
       Logger.info("GM: extracted ${cookies.length} cookies");
       
-      // TODO: Pass cookies to Rust
-      // await api.gmSetCookiesFromWebview(cookieHeader);
+      // Build session data structure
+      final sessionData = {
+        'cookies': cookieHeader,
+        'user_agent': _desktopUserAgent,
+        'paired_at': DateTime.now().toIso8601String(),
+      };
+      
+      // Save to Android Keystore-backed secure storage
+      final sessionJson = jsonEncode(sessionData);
+      final sessionBytes = Uint8List.fromList(utf8.encode(sessionJson));
+      
+      final saved = await GmSecureStorageService.saveSession(sessionBytes);
+      if (!saved) {
+        throw Exception("Failed to save session to secure storage");
+      }
+      
+      Logger.info("GM: session saved to secure storage");
+      
+      // TODO: Once FRB bindings are regenerated, initialize Rust session:
+      // await RustLib.instance.api.crateApiApiGmSetCookiesFromWebview(
+      //   cookies: cookieHeader,
+      //   userAgent: _desktopUserAgent,
+      // );
       
       // Update pairing state
       ss.settings.gmPairingState.value = GmPairingState.paired;

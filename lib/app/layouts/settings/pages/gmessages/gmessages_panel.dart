@@ -423,8 +423,11 @@ class _GoogleMessagesPanelState extends OptimizedState<GoogleMessagesPanel> {
 
   Future<void> _performLogout() async {
     try {
-      // TODO: Call Rust gm_logout
-      // await api.gmLogout();
+      // Clear secure storage
+      await GmSecureStorageService.clearSession();
+      
+      // TODO: Call Rust gm_logout once FRB bindings are regenerated
+      // await RustLib.instance.api.crateApiApiGmLogout();
       
       ss.settings.gmPairingState.value = GmPairingState.notPaired;
       await ss.settings.saveOne('gmPairingState');

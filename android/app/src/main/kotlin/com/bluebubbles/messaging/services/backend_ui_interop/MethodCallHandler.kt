@@ -16,6 +16,7 @@ import com.bluebubbles.messaging.services.filesystem.GetContentUriPathHandler
 import com.bluebubbles.messaging.services.firebase.FirebaseAuthHandler
 import com.bluebubbles.messaging.services.firebase.FirebaseDeleteTokenHandler
 import com.bluebubbles.messaging.services.firebase.ServerUrlRequestHandler
+import com.bluebubbles.messaging.services.gmessages.GmStorageHandler
 import com.bluebubbles.messaging.services.firebase.UpdateNextRestartHandler
 import com.bluebubbles.messaging.services.notifications.CreateIncomingFaceTimeNotification
 import com.bluebubbles.messaging.services.notifications.CreateIncomingMessageNotification
@@ -143,9 +144,14 @@ class MethodCallHandler {
             KeystoreUnlockHandler.tag -> KeystoreUnlockHandler().handleMethodCall(call, result, context)
             "ready" -> { MainActivity.engine_ready = true }
             else -> {
-                val error = "Could not find method call handler for ${call.method}!"
-                Log.d(Constants.logTag, error)
-                result.error("500", error, null)
+                // Check if this is a Google Messages storage call
+                if (GmStorageHandler.canHandle(call.method)) {
+                    GmStorageHandler().handle(call, result, context)
+                } else {
+                    val error = "Could not find method call handler for ${call.method}!"
+                    Log.d(Constants.logTag, error)
+                    result.error("500", error, null)
+                }
             }
         }
     }

@@ -36,3 +36,4 @@ export 'ui/attachments_service.dart';
 export 'ui/contact_service.dart';
 export 'ui/unifiedpush.dart';
 export 'ui/extension_service.dart';
+export 'gmessages/gm_secure_storage_service.dart';
