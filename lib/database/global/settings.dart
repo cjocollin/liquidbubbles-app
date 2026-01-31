@@ -214,6 +214,10 @@ class Settings {
   final RxBool attachmentSyncEnabled = false.obs;
   final RxnString keychainDefaultPassword = RxnString();
 
+  // Google Messages (Experimental) - Android only
+  final RxBool enableGoogleMessages = false.obs;
+  final Rx<GMPairingState> gmPairingState = GMPairingState.notPaired.obs;
+
   final RxMap<String, String?> ctags = <String, String?>{}.obs;
   final RxMap<String, String?> tokens = <String, String?>{}.obs;
   final RxString contactSyncProvider = "iCloud".obs;
@@ -440,6 +444,8 @@ class Settings {
       'cloudSyncingEnabled': cloudSyncingEnabled.value,
       'attachmentSyncEnabled': attachmentSyncEnabled.value,
       'contactSyncProvider': contactSyncProvider.value,
+      'enableGoogleMessages': enableGoogleMessages.value,
+      'gmPairingState': gmPairingState.value.index,
     };
     if (includeAll) {
       map.addAll({
@@ -620,6 +626,10 @@ class Settings {
     ss.settings.attachmentSyncEnabled.value = map['attachmentSyncEnabled'] ?? false;
     ss.settings.ctags.value = map['ctags'] ?? {};
     ss.settings.tokens.value = map['tokens'] ?? {};
+    ss.settings.enableGoogleMessages.value = map['enableGoogleMessages'] ?? false;
+    ss.settings.gmPairingState.value = map['gmPairingState'] != null
+        ? GMPairingState.values[map['gmPairingState']]
+        : GMPairingState.notPaired;
     ss.settings.save();
 
     eventDispatcher.emit("theme-update", null);
@@ -795,6 +805,10 @@ class Settings {
 
     s.ctags.value =  map['ctags'] is String ? jsonDecode(map['ctags']).cast<String, String?>() : <String, String?>{};
     s.tokens.value =  map['tokens'] is String ? jsonDecode(map['tokens']).cast<String, String?>() : <String, String?>{};
+    s.enableGoogleMessages.value = map['enableGoogleMessages'] ?? false;
+    s.gmPairingState.value = map['gmPairingState'] != null
+        ? GMPairingState.values[map['gmPairingState']]
+        : GMPairingState.notPaired;
     return s;
   }
 

@@ -139,6 +139,15 @@ enum PlayerStatus { NONE, STOPPED, PAUSED, PLAYING, ENDED }
 
 enum PayloadType {url, app}
 
+/// Google Messages pairing state (Android only, experimental)
+enum GMPairingState {
+  notPaired,
+  waitingForPairing,
+  paired,
+  expired,
+  error,
+}
+
 final urlRegex = RegExp(
     r"(?:^| )(((((H|h)(T|t)|(F|f))(T|t)(P|p)((S|s)?))\://)|www.)[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,6}(\:[0-9]{1,5})*(/($|[a-zA-Z0-9\.\,\;\?\'\\\+&amp;%\$#@!^*()\=~_\/-]+))*");
 
