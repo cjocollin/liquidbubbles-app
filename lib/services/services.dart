@@ -38,3 +38,4 @@ export 'ui/unifiedpush.dart';
 export 'ui/extension_service.dart';
 export 'gmessages/gm_secure_storage_service.dart';
 export 'gmessages/gm_chats_service.dart';
+export 'gmessages/gm_message_router.dart';
