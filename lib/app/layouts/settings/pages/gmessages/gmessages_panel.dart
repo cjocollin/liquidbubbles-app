@@ -1,3 +1,4 @@
+import 'package:bluebubbles/app/layouts/settings/pages/gmessages/gm_diagnostics_screen.dart';
 import 'package:bluebubbles/app/layouts/settings/pages/gmessages/gm_pairing_webview.dart';
 import 'package:bluebubbles/app/layouts/settings/widgets/settings_widgets.dart';
 import 'package:bluebubbles/app/wrappers/stateful_boilerplate.dart';
@@ -198,6 +199,43 @@ class _GoogleMessagesPanelState extends OptimizedState<GoogleMessagesPanel> {
                             const SizedBox(height: 8),
                             _buildLimitation("Some features may not work with all carriers"),
                           ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            }),
+            
+            // Advanced section (diagnostics)
+            Obx(() {
+              if (!ss.settings.enableGoogleMessages.value) {
+                return const SizedBox.shrink();
+              }
+              
+              return Column(
+                children: [
+                  SettingsHeader(
+                    iosSubtitle: iosSubtitle,
+                    materialSubtitle: materialSubtitle,
+                    text: "Advanced",
+                  ),
+                  SettingsSection(
+                    backgroundColor: tileColor,
+                    children: [
+                      SettingsTile(
+                        backgroundColor: tileColor,
+                        title: "Diagnostics",
+                        subtitle: "View connection status and debug info",
+                        leading: SettingsLeadingIcon(
+                          iosIcon: CupertinoIcons.wrench_fill,
+                          materialIcon: Icons.bug_report,
+                          containerColor: Colors.purple,
+                        ),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const GmDiagnosticsScreen(),
+                          ),
                         ),
                       ),
                     ],
