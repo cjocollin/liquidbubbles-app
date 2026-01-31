@@ -14,6 +14,15 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:universal_io/io.dart';
 
+/// Google Messages pairing state
+enum GmPairingState {
+  notPaired,
+  waitingForPairing,
+  paired,
+  expired,
+  error,
+}
+
 class Settings {
   final RxInt firstFcmRegisterDate = 0.obs;
   final RxString iCloudAccount = "".obs;
@@ -213,6 +222,10 @@ class Settings {
   final RxBool cloudSyncingEnabled = false.obs;
   final RxBool attachmentSyncEnabled = false.obs;
   final RxnString keychainDefaultPassword = RxnString();
+
+  // Google Messages integration (Experimental)
+  final RxBool enableGoogleMessages = false.obs;
+  final Rx<GmPairingState> gmPairingState = GmPairingState.notPaired.obs;
 
   final RxMap<String, String?> ctags = <String, String?>{}.obs;
   final RxMap<String, String?> tokens = <String, String?>{}.obs;
@@ -440,6 +453,9 @@ class Settings {
       'cloudSyncingEnabled': cloudSyncingEnabled.value,
       'attachmentSyncEnabled': attachmentSyncEnabled.value,
       'contactSyncProvider': contactSyncProvider.value,
+      // Google Messages
+      'enableGoogleMessages': enableGoogleMessages.value,
+      'gmPairingState': gmPairingState.value.index,
     };
     if (includeAll) {
       map.addAll({
@@ -620,6 +636,11 @@ class Settings {
     ss.settings.attachmentSyncEnabled.value = map['attachmentSyncEnabled'] ?? false;
     ss.settings.ctags.value = map['ctags'] ?? {};
     ss.settings.tokens.value = map['tokens'] ?? {};
+    // Google Messages
+    ss.settings.enableGoogleMessages.value = map['enableGoogleMessages'] ?? false;
+    ss.settings.gmPairingState.value = map['gmPairingState'] != null 
+        ? GmPairingState.values[map['gmPairingState']] 
+        : GmPairingState.notPaired;
     ss.settings.save();
 
     eventDispatcher.emit("theme-update", null);
@@ -795,6 +816,12 @@ class Settings {
 
     s.ctags.value =  map['ctags'] is String ? jsonDecode(map['ctags']).cast<String, String?>() : <String, String?>{};
     s.tokens.value =  map['tokens'] is String ? jsonDecode(map['tokens']).cast<String, String?>() : <String, String?>{};
+    
+    // Google Messages
+    s.enableGoogleMessages.value = map['enableGoogleMessages'] ?? false;
+    s.gmPairingState.value = map['gmPairingState'] != null 
+        ? GmPairingState.values[map['gmPairingState']] 
+        : GmPairingState.notPaired;
     return s;
   }
 
