@@ -1,6 +1,7 @@
 import 'package:bluebubbles/helpers/helpers.dart';
 import 'package:bluebubbles/app/layouts/conversation_list/pages/conversation_list.dart';
 import 'package:bluebubbles/app/layouts/conversation_list/widgets/conversation_list_fab.dart';
+import 'package:bluebubbles/app/layouts/conversation_list/widgets/gm_threads_section.dart';
 import 'package:bluebubbles/app/layouts/conversation_list/widgets/header/material_header.dart';
 import 'package:bluebubbles/app/layouts/conversation_list/widgets/tile/list_item.dart';
 import 'package:bluebubbles/app/wrappers/stateful_boilerplate.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get/get.dart';
 import 'package:bluebubbles/database/models.dart';
+import 'package:universal_io/io.dart';
 
 class MaterialConversationList extends StatefulWidget {
   const MaterialConversationList({Key? key, required this.parentController});
@@ -34,6 +36,9 @@ class _MaterialConversationListState extends OptimizedState<MaterialConversation
       ? context.theme.colorScheme.background
       : Colors.transparent;
   ConversationListController get controller => widget.parentController;
+  
+  // GM section collapse state
+  final RxBool _gmSectionCollapsed = false.obs;
 
   @override
   void initState() {
@@ -42,6 +47,13 @@ class _MaterialConversationListState extends OptimizedState<MaterialConversation
     if (kIsDesktop) {
       ss.settings.windowEffect.listen((WindowEffect effect) {
         setState(() {});
+      });
+    }
+    
+    // Initialize GM service if enabled (Android only)
+    if (Platform.isAndroid && ss.settings.enableGoogleMessages.value) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        gmChats.initialize();
       });
     }
   }
@@ -119,26 +131,42 @@ class _MaterialConversationListState extends OptimizedState<MaterialConversation
               child: ScrollbarWrapper(
                 showScrollbar: true,
                 controller: controller.materialScrollController,
-                child: Obx(() => ListView.builder(
-                      controller: controller.materialScrollController,
-                      physics: ThemeSwitcher.getScrollPhysics(),
-                      findChildIndexCallback: (key) => findChildIndexByKey(_chats, key, (item) => item.guid),
-                      itemBuilder: (context, index) {
-                        final chat = _chats[index];
-                        return Container(
-                          key: ValueKey(chat.guid),
-                          child: ListItem(
-                            chat: chat,
-                            controller: controller,
-                            showDeleted: showDeleted,
-                            update: () {
-                              setState(() {});
-                            }
-                          )
-                        );
-                      },
-                      itemCount: _chats.length,
+                child: CustomScrollView(
+                  controller: controller.materialScrollController,
+                  physics: ThemeSwitcher.getScrollPhysics(),
+                  slivers: [
+                    // GM Threads Section (only show on main list, not archived/unknown/deleted)
+                    if (!showArchived && !showUnknown && !showDeleted && Platform.isAndroid)
+                      SliverToBoxAdapter(
+                        child: Obx(() => GmThreadsSection(
+                          collapsed: _gmSectionCollapsed.value,
+                          onToggleCollapse: () => _gmSectionCollapsed.toggle(),
+                        )),
+                      ),
+                    
+                    // Regular chats list
+                    Obx(() => SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final chat = _chats[index];
+                          return Container(
+                            key: ValueKey(chat.guid),
+                            child: ListItem(
+                              chat: chat,
+                              controller: controller,
+                              showDeleted: showDeleted,
+                              update: () {
+                                setState(() {});
+                              }
+                            )
+                          );
+                        },
+                        childCount: _chats.length,
+                        findChildIndexCallback: (key) => findChildIndexByKey(_chats, key, (item) => item.guid),
+                      ),
                     )),
+                  ],
+                ),
               ),
             );
           }),
